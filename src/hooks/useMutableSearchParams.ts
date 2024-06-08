@@ -19,7 +19,6 @@ export const useMutableSearchParams = () => {
   }
 
   return {
-    searchParams,
     get,
     set: (key: string, value: string) => {
       query.set(key, value);

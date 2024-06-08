@@ -39,8 +39,10 @@ export function DataTableFacetedFilter<TData, TValue>({
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
-  const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
   const query = useMutableSearchParams();
+  const [selectedValues, setSelectedValues] = React.useState<string[]>(
+    query.get(title?.toLowerCase()!, true)
+  );
 
   React.useEffect(() => {
     if (!title) return;

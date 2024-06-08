@@ -7,8 +7,20 @@ export const useMutableSearchParams = () => {
 
   const query = new URLSearchParams(searchParams);
 
+  function get<IsArray extends boolean>(
+    key: string,
+    asArray: IsArray
+  ): IsArray extends true ? string[] : string;
+  function get(key: string, isArray: boolean): string[] | string {
+    if (isArray) {
+      return query.get(key)?.split(",") ?? [];
+    }
+    return query.get(key) ?? "";
+  }
+
   return {
     searchParams,
+    get,
     set: (key: string, value: string) => {
       query.set(key, value);
       router.replace(`${pathname}?${query.toString()}`);

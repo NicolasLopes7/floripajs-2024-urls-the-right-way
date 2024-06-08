@@ -29,15 +29,20 @@ export function DataTableToolbar<TData>({
     table.getColumn("title")?.setFilterValue(search);
   }, []);
 
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const search = event.target.value;
+    if (!search) searchParams.remove("search");
+    table.getColumn("title")?.setFilterValue(search);
+    searchParams.set("search", search);
+  };
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder="Filter tasks..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
+          onChange={handleOnChange}
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {table.getColumn("status") && (

@@ -1,3 +1,4 @@
+"use client";
 /**
  * v0 by Vercel.
  * @see https://v0.dev/t/CSnUOLew5zf
@@ -13,15 +14,40 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { PropsWithChildren } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { PropsWithChildren } from "react";
 import { Task } from "../data/schema";
 
 export const TaskDetails = ({
   children,
   task,
 }: PropsWithChildren<{ task: Task }>) => {
+  const [open, setOpen] = React.useState(false);
+  const pathname = usePathname();
+  const query = useSearchParams();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (query.get("task") === task.id) {
+      setOpen(true);
+    }
+  }, [query, task.id]);
+
+  const handleOpen = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    const params = new URLSearchParams(query);
+
+    if (nextOpen) {
+      params.set("task", task.id);
+    } else {
+      params.delete("task");
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>

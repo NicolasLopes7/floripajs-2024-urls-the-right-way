@@ -1,12 +1,12 @@
 "use client";
 
-import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./data-table-view-options";
 
+import { useMutableSearchParams } from "@/hooks/useMutableSearchParams";
+import { useEffect } from "react";
 import { priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
@@ -17,7 +17,22 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
+  const searchParams = useMutableSearchParams();
   const isFiltered = table.getState().columnFilters.length > 0;
+
+  useEffect(() => {
+    const search = searchParams.get("search", false);
+    if (!search) return;
+
+    table.getColumn("title")?.setFilterValue(search);
+  }, []);
+
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const search = event.target.value;
+    if (!search) searchParams.remove("search");
+    table.getColumn("title")?.setFilterValue(search);
+    searchParams.set("search", search);
+  };
 
   return (
     <div className="flex items-center justify-between">
@@ -25,9 +40,7 @@ export function DataTableToolbar<TData>({
         <Input
           placeholder="Filter tasks..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
+          onChange={handleOnChange}
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {table.getColumn("status") && (
@@ -43,16 +56,6 @@ export function DataTableToolbar<TData>({
             title="Priority"
             options={priorities}
           />
-        )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
-          >
-            Reset
-            <Cross2Icon className="ml-2 h-4 w-4" />
-          </Button>
         )}
       </div>
       <DataTableViewOptions table={table} />

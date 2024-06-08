@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./data-table-view-options";
 
+import { useMutableSearchParams } from "@/hooks/useMutableSearchParams";
+import { useEffect } from "react";
 import { priorities, statuses } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
@@ -17,7 +19,15 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
+  const searchParams = useMutableSearchParams();
   const isFiltered = table.getState().columnFilters.length > 0;
+
+  useEffect(() => {
+    const search = searchParams.get("search", false);
+    if (!search) return;
+
+    table.getColumn("title")?.setFilterValue(search);
+  }, []);
 
   return (
     <div className="flex items-center justify-between">

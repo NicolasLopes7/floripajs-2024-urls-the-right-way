@@ -13,15 +13,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { PropsWithChildren } from "react";
+import { useMutableSearchParams } from "@/hooks/useMutableSearchParams";
+import React, { PropsWithChildren } from "react";
 import { Task } from "../data/schema";
 
 export const TaskDetails = ({
   children,
   task,
 }: PropsWithChildren<{ task: Task }>) => {
+  const [open, setOpen] = React.useState(false);
+  const query = useMutableSearchParams();
+
+  React.useEffect(() => {
+    if (query.get("selected_task", false) === task.id) {
+      setOpen(true);
+    }
+  }, []);
+
+  const handleOpen = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+
+    if (nextOpen) {
+      return query.set("selected_task", task.id);
+    }
+    query.remove("selected_task");
+  };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>

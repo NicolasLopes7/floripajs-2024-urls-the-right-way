@@ -36,6 +36,11 @@ export function DataTableToolbar<TData>({
     searchParams.set("search", search);
   };
 
+  const handleReset = () => {
+    table.resetColumnFilters();
+    searchParams.clear();
+  };
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -62,7 +67,7 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={handleReset}
             className="h-8 px-2 lg:px-3"
           >
             Reset

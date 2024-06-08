@@ -24,6 +24,10 @@ export const useMutableSearchParams = () => {
       query.set(key, value);
       router.replace(`${pathname}?${query.toString()}`);
     },
+    clear: () => {
+      query.forEach((_, key) => query.delete(key));
+      router.replace(`${pathname}?${query.toString()}`);
+    },
     remove: (key: string) => {
       query.delete(key);
       router.replace(`${pathname}?${query.toString()}`);

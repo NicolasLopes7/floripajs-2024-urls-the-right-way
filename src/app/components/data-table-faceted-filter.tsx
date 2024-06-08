@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { useMutableSearchParams } from "@/hooks/useMutableSearchParams";
 import { cn } from "@/lib/utils";
 
 interface DataTableFacetedFilterProps<TData, TValue> {
@@ -39,11 +40,19 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const [selectedValues, setSelectedValues] = React.useState<string[]>([]);
+  const query = useMutableSearchParams();
 
   React.useEffect(() => {
-    column?.setFilterValue(
-      selectedValues.length === 0 ? undefined : selectedValues
-    );
+    if (!title) return;
+    const newValue = selectedValues.length === 0 ? undefined : selectedValues;
+    column?.setFilterValue(newValue);
+
+    if (newValue) {
+      query.set(title.toLowerCase(), newValue.join(","));
+      return;
+    }
+
+    query.remove(title.toLowerCase());
   }, [selectedValues]);
 
   const handleSelect = (isSelected: boolean) => (value: string) => {
